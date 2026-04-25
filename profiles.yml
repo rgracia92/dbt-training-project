@@ -1,0 +1,7 @@
+dbt_training_project:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: dbt_training.duckdb
+      threads: 4

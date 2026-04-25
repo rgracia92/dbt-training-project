@@ -1,0 +1,27 @@
+name: 'dbt_training_project'
+version: '1.0.0'
+config-version: 2
+
+profile: 'dbt_training_project'
+
+model-paths: ['models']
+analysis-paths: ['analyses']
+seed-paths: ['seeds']
+test-paths: ['tests']
+macro-paths: ['macros']
+snapshot-paths: ['snapshots']
+
+clean-targets:
+  - 'target'
+  - 'dbt_packages'
+
+models:
+  dbt_training_project:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+
+seeds:
+  dbt_training_project:
+    +quote_columns: false

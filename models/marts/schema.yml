@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: Dimensión de clientes para análisis.
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_orders
+    description: Tabla de hechos de pedidos enriquecida con datos de cliente.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_id
