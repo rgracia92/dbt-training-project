@@ -5,6 +5,7 @@ models:
     description: Dimensión de clientes para análisis.
     columns:
       - name: customer_id
+        description: Identificador único de cliente.
         tests:
           - not_null
           - unique
@@ -20,5 +21,6 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('dim_customers')
-              field: customer_id
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id

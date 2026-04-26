@@ -4,4 +4,4 @@ select
     cast(order_date as date) as order_date,
     cast(amount as numeric(10,2)) as amount,
     upper(status) as order_status
-from {{ ref('orders') }}
+from {{ source('raw', 'orders') }}

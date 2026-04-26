@@ -1,22 +1,35 @@
 version: 2
 
+sources:
+  - name: raw
+    description: Datos de entrada inicializados en Postgres al arrancar Docker.
+    schema: raw
+    tables:
+      - name: orders
+        description: Pedidos en bruto.
+      - name: customers
+        description: Clientes en bruto.
+
 models:
   - name: stg_orders
-    description: Pedidos estandarizados a partir de la seed raw.
+    description: Pedidos estandarizados a partir del source raw.
     columns:
       - name: order_id
+        description: Identificador único de pedido.
         tests:
           - not_null
           - unique
       - name: customer_id
+        description: Identificador único de cliente.
         tests:
           - not_null
       - name: order_status
+        description: Estado del pedido.
         tests:
           - not_null
 
   - name: stg_customers
-    description: Clientes estandarizados a partir de la seed raw.
+    description: Clientes estandarizados a partir del source raw.
     columns:
       - name: customer_id
         tests:

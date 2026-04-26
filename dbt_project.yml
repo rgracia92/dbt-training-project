@@ -6,7 +6,6 @@ profile: 'dbt_training_project'
 
 model-paths: ['models']
 analysis-paths: ['analyses']
-seed-paths: ['seeds']
 test-paths: ['tests']
 macro-paths: ['macros']
 snapshot-paths: ['snapshots']
@@ -19,9 +18,7 @@ models:
   dbt_training_project:
     staging:
       +materialized: view
+      +schema: staging
     marts:
       +materialized: table
-
-seeds:
-  dbt_training_project:
-    +quote_columns: false
+      +schema: datamart_analytics # optional. By default it's taken from profile.yml

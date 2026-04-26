@@ -4,4 +4,4 @@ select
     last_name,
     email,
     cast(signup_date as date) as signup_date
-from {{ ref('customers') }}
+from {{ source('raw', 'customers') }}
