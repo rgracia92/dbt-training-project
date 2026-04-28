@@ -25,6 +25,66 @@ dbt-training-project/
 │   └── marts/
 ```
 
+### dbt_project.yml
+
+Es el archivo principal del proyecto `dbt`.
+
+Aquí se define:
+
+- el nombre del proyecto
+- el `profile` que debe usar `dbt`
+- las rutas de carpetas como `models`, `macros` o `analyses`
+- la configuración de materialización de los modelos
+- los directorios que se limpian con `dbt clean`
+
+### profiles.yml
+
+Define cómo se conecta `dbt` a la base de datos en cada entorno.
+
+En este proyecto incluye perfiles como `dev` y `pre`, con datos como:
+
+- host
+- puerto
+- usuario
+- contraseña
+- base de datos
+- esquema por defecto
+
+### models
+
+Es la carpeta donde viven los modelos SQL de `dbt`.
+
+En este proyecto está separada en dos capas:
+
+- `staging/`: modelos intermedios que leen de `raw`, tipan columnas, renombran campos y normalizan datos.
+- `marts/`: modelos finales orientados a análisis, como dimensiones y tablas de hechos.
+
+Dentro de esta carpeta también se incluyen archivos `schema.yml`, donde se documentan modelos, `sources` y tests.
+
+### macros
+
+Contiene macros Jinja reutilizables de `dbt`.
+
+En este proyecto se usa para personalizar cómo se resuelve el esquema de destino al materializar modelos, mediante `generate_schema_name.sql`.
+
+### docker
+
+Agrupa los recursos necesarios para inicializar la base de datos local.
+
+En `docker/postgres/init/01_init_raw.sql` se crean los esquemas y tablas de ejemplo, y se cargan datos iniciales en `raw` cuando arranca el contenedor por primera vez.
+
+### docker-compose.yml
+
+Define el servicio local de `Postgres` que usa el proyecto.
+
+Se utiliza para:
+
+- levantar la base de datos con Docker
+- exponer el puerto `5432`
+- configurar usuario, contraseña y base de datos mediante variables de entorno
+- montar el script de inicialización SQL
+- persistir los datos en un volumen Docker
+
 ## Requisitos
 
 - Docker con `docker compose`
@@ -45,17 +105,63 @@ source .venv/bin/activate
 make postgres-up
 ```
 
-3. Ejecutar el pipeline de `dbt`:
+3. Verificar la conexión de `dbt` con la base:
+
+```bash
+dbt debug --profiles-dir .
+```
+
+## Cómo funciona dbt en este proyecto
+
+Los datos de entrada ya existen en `Postgres` dentro del esquema `raw`.
+
+- `dbt` lee esas tablas declaradas como `sources`
+- ejecuta los modelos SQL de `staging` y `marts`
+- materializa vistas y tablas en los esquemas `staging` y `analytics`
+- ejecuta tests definidos en los ficheros `schema.yml`
+
+En este proyecto:
+
+- `source('raw', 'customers')` y `source('raw', 'orders')` leen tablas ya existentes en la base
+- los modelos de `staging` limpian y tipan los datos
+- los modelos de `marts` construyen las tablas finales de análisis
+
+## Ejecutar dbt con comandos separados
+
+Si quieres ver el flujo paso a paso, primero ejecuta los modelos:
+
+```bash
+dbt run --profiles-dir .
+```
+
+Después ejecuta los tests:
+
+```bash
+dbt test --profiles-dir .
+```
+
+Si prefieres usar `make`:
+
+```bash
+make dbt-run
+make dbt-test
+```
+
+## Ejecutar dbt con un solo comando
+
+Si quieres ejecutar el flujo completo de una vez, puedes usar:
+
+```bash
+make dbt-build
+```
+
+o directamente:
 
 ```bash
 dbt build --profiles-dir .
 ```
 
-Si prefieres usar `make` también para `dbt`:
-
-```bash
-make dbt-build
-```
+`dbt build` ejecuta en orden los modelos y sus tests, por lo que es la forma más cómoda de correr el proyecto completo.
 
 ## Configuración por defecto
 
@@ -100,6 +206,22 @@ Con la base levantada:
 dbt debug --profiles-dir .
 dbt build --profiles-dir .
 ```
+
+## Generar documentación
+
+Para generar la documentación del proyecto:
+
+```bash
+dbt docs generate --profiles-dir .
+```
+
+Para servirla en local:
+
+```bash
+dbt docs serve --profiles-dir .
+```
+
+Por defecto, la documentación queda disponible en `http://localhost:8080`.
 
 ## Notas
 

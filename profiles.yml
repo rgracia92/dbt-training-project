@@ -1,6 +1,7 @@
 dbt_training_project:
   target: dev
   outputs:
+
     dev:
       type: postgres
       host: "{{ env_var('DBT_HOST', 'localhost') }}"
@@ -8,5 +9,15 @@ dbt_training_project:
       user: "{{ env_var('DBT_USER', 'dbt') }}"
       password: "{{ env_var('DBT_PASSWORD', 'dbt') }}"
       dbname: "{{ env_var('DBT_DBNAME', 'dbt_training') }}"
-      schema: "{{ env_var('DBT_SCHEMA', 'dbt_trainging_schema') }}"
+      schema: dev_schema
+      threads: 4
+
+    pre:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_USER', 'dbt') }}"
+      password: "{{ env_var('DBT_PASSWORD', 'dbt') }}"
+      dbname: "{{ env_var('DBT_DBNAME', 'dbt_training_pre') }}"
+      schema: dev_schema
       threads: 4
